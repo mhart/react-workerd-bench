@@ -1,6 +1,6 @@
 # React streaming benchmark on workerd vs node
 
-A benchmark to compare React (18.3.1) streaming rendering in workerd and Node.js.
+A benchmark to compare React (18.3.1) streaming rendering in workerd and Node.js (running locally).
 
 Originally taken from the [`react-ssr-bench` benchmark from t3dotgg](https://github.com/t3dotgg/cf-vs-vercel-bench/tree/main/react-ssr-bench/cf-edition),
 and modified to use streaming rendering instead of React's legacy `renderToString`.
