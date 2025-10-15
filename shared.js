@@ -408,7 +408,7 @@ const require_server_node = __commonJS({
     var destinationHasCapacity = true;
 
     function writeStringChunk(destination, chunk) {
-      if (0 !== chunk.length)
+      if (0 !== chunk.length) {
         if (VIEW_SIZE < 3 * chunk.length) {
           0 < writtenBytes &&
             (writeToDestination(
@@ -436,53 +436,60 @@ const require_server_node = __commonJS({
             (currentView = new Uint8Array(VIEW_SIZE)),
             (writtenBytes = 0));
         }
+      }
+    }
+
+    function writeViewChunk(destination, chunk) {
+      var allowableBytes;
+      0 !== chunk.byteLength &&
+        (VIEW_SIZE < chunk.byteLength
+          ? (0 < writtenBytes &&
+              (writeToDestination(
+                destination,
+                currentView.subarray(0, writtenBytes)
+              ),
+              (currentView = new Uint8Array(VIEW_SIZE)),
+              (writtenBytes = 0)),
+            writeToDestination(destination, chunk))
+          : ((allowableBytes = currentView.length - writtenBytes),
+            allowableBytes < chunk.byteLength &&
+              (0 === allowableBytes
+                ? writeToDestination(destination, currentView)
+                : (currentView.set(
+                    chunk.subarray(0, allowableBytes),
+                    writtenBytes
+                  ),
+                  (writtenBytes += allowableBytes),
+                  writeToDestination(destination, currentView),
+                  (chunk = chunk.subarray(allowableBytes))),
+              (currentView = new Uint8Array(VIEW_SIZE)),
+              (writtenBytes = 0)),
+            currentView.set(chunk, writtenBytes),
+            (writtenBytes += chunk.byteLength),
+            VIEW_SIZE === writtenBytes &&
+              (writeToDestination(destination, currentView),
+              (currentView = new Uint8Array(VIEW_SIZE)),
+              (writtenBytes = 0))));
     }
 
     function writeChunk(destination, chunk) {
-      var allowableBytes;
       if ("string" === typeof chunk) {
         writeStringChunk(destination, chunk);
       } else {
-        // writeViewChunk
-        0 !== chunk.byteLength &&
-          (VIEW_SIZE < chunk.byteLength
-            ? (0 < writtenBytes &&
-                (writeToDestination(
-                  destination,
-                  currentView.subarray(0, writtenBytes)
-                ),
-                (currentView = new Uint8Array(VIEW_SIZE)),
-                (writtenBytes = 0)),
-              writeToDestination(destination, chunk))
-            : ((allowableBytes = currentView.length - writtenBytes),
-              allowableBytes < chunk.byteLength &&
-                (0 === allowableBytes
-                  ? writeToDestination(destination, currentView)
-                  : (currentView.set(
-                      chunk.subarray(0, allowableBytes),
-                      writtenBytes
-                    ),
-                    (writtenBytes += allowableBytes),
-                    writeToDestination(destination, currentView),
-                    (chunk = chunk.subarray(allowableBytes))),
-                (currentView = new Uint8Array(VIEW_SIZE)),
-                (writtenBytes = 0)),
-              currentView.set(chunk, writtenBytes),
-              (writtenBytes += chunk.byteLength),
-              VIEW_SIZE === writtenBytes &&
-                (writeToDestination(destination, currentView),
-                (currentView = new Uint8Array(VIEW_SIZE)),
-                (writtenBytes = 0))));
+        writeViewChunk(destination, chunk);
       }
     }
+
     function writeToDestination(destination, view) {
       destination = destination.write(view);
       destinationHasCapacity = destinationHasCapacity && destination;
     }
+
     function writeChunkAndReturn(a, b) {
       writeChunk(a, b);
       return destinationHasCapacity;
     }
+
     function completeWriting(destination) {
       currentView &&
         0 < writtenBytes &&
@@ -491,11 +498,15 @@ const require_server_node = __commonJS({
       writtenBytes = 0;
       destinationHasCapacity = true;
     }
+
     var textEncoder = new TextEncoder();
+
     function stringToPrecomputedChunk(a) {
       return textEncoder.encode(a);
     }
+
     var hasOwnProperty = Object.prototype.hasOwnProperty;
+
     var VALID_ATTRIBUTE_NAME_REGEX =
       /^[:A-Z_a-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD][:A-Z_a-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\-.0-9\u00B7\u0300-\u036F\u203F-\u2040]*$/;
     var illegalAttributeNameCache = {};
