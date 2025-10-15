@@ -398,6 +398,17 @@ const require_react = __commonJS({
 
 const React = require_react();
 
+const reactTimings = (globalThis.reactTimings = {
+  numRequests: 0,
+  myEncode: 0,
+  myEncodeInto: 0,
+  mySubarray: 0,
+  myArraySet: 0,
+  myNewArray: 0,
+  writeStringChunk: 0,
+  writeViewChunk: 0,
+});
+
 const require_server_node = __commonJS({
   "node_modules/react-dom/cjs/react-dom-server.node.production.min.js"(
     exports
@@ -407,69 +418,112 @@ const require_server_node = __commonJS({
     var writtenBytes = 0;
     var destinationHasCapacity = true;
 
+    var textEncoder = new TextEncoder();
+
+    function myEncode(str) {
+      const start = performance.now();
+      const result = textEncoder.encode(str);
+      reactTimings.myEncode += performance.now() - start;
+      return result;
+    }
+
+    function myEncodeInto(str, view) {
+      const start = performance.now();
+      const result = textEncoder.encodeInto(str, view);
+      reactTimings.myEncodeInto += performance.now() - start;
+      return result;
+    }
+
+    function mySubarray(view, begin, end) {
+      const start = performance.now();
+      const result = view.subarray(begin, end);
+      reactTimings.mySubarray += performance.now() - start;
+      return result;
+    }
+
+    function myArraySet(view, src, offset) {
+      const start = performance.now();
+      const result = view.set(src, offset);
+      reactTimings.myArraySet += performance.now() - start;
+      return result;
+    }
+
+    function myNewArray() {
+      const start = performance.now();
+      const result = new Uint8Array(VIEW_SIZE);
+      reactTimings.myNewArray += performance.now() - start;
+      return result;
+    }
+
     function writeStringChunk(destination, chunk) {
+      const start = performance.now();
+
       if (0 !== chunk.length) {
         if (VIEW_SIZE < 3 * chunk.length) {
           0 < writtenBytes &&
             (writeToDestination(
               destination,
-              currentView.subarray(0, writtenBytes)
+              mySubarray(currentView, 0, writtenBytes)
             ),
-            (currentView = new Uint8Array(VIEW_SIZE)),
+            (currentView = myNewArray()),
             (writtenBytes = 0)),
-            writeToDestination(destination, textEncoder.encode(chunk));
+            writeToDestination(destination, myEncode(chunk));
         } else {
           var target = currentView;
-          0 < writtenBytes && (target = currentView.subarray(writtenBytes));
-          target = textEncoder.encodeInto(chunk, target);
+          0 < writtenBytes && (target = mySubarray(currentView, writtenBytes));
+          target = myEncodeInto(chunk, target);
           var d = target.read;
           writtenBytes += target.written;
           d < chunk.length &&
             (writeToDestination(destination, currentView),
-            (currentView = new Uint8Array(VIEW_SIZE)),
-            (writtenBytes = textEncoder.encodeInto(
-              chunk.slice(d),
-              currentView
-            ).written));
+            (currentView = myNewArray()),
+            (writtenBytes = myEncodeInto(chunk.slice(d), currentView).written));
           VIEW_SIZE === writtenBytes &&
             (writeToDestination(destination, currentView),
-            (currentView = new Uint8Array(VIEW_SIZE)),
+            (currentView = myNewArray()),
             (writtenBytes = 0));
         }
       }
+
+      reactTimings.writeStringChunk += performance.now() - start;
     }
 
     function writeViewChunk(destination, chunk) {
+      const start = performance.now();
+
       var allowableBytes;
       0 !== chunk.byteLength &&
         (VIEW_SIZE < chunk.byteLength
           ? (0 < writtenBytes &&
               (writeToDestination(
                 destination,
-                currentView.subarray(0, writtenBytes)
+                mySubarray(currentView, 0, writtenBytes)
               ),
-              (currentView = new Uint8Array(VIEW_SIZE)),
+              (currentView = myNewArray()),
               (writtenBytes = 0)),
             writeToDestination(destination, chunk))
           : ((allowableBytes = currentView.length - writtenBytes),
             allowableBytes < chunk.byteLength &&
               (0 === allowableBytes
                 ? writeToDestination(destination, currentView)
-                : (currentView.set(
-                    chunk.subarray(0, allowableBytes),
+                : (myArraySet(
+                    currentView,
+                    mySubarray(chunk, 0, allowableBytes),
                     writtenBytes
                   ),
                   (writtenBytes += allowableBytes),
                   writeToDestination(destination, currentView),
-                  (chunk = chunk.subarray(allowableBytes))),
-              (currentView = new Uint8Array(VIEW_SIZE)),
+                  (chunk = mySubarray(chunk, allowableBytes))),
+              (currentView = myNewArray()),
               (writtenBytes = 0)),
-            currentView.set(chunk, writtenBytes),
+            myArraySet(currentView, chunk, writtenBytes),
             (writtenBytes += chunk.byteLength),
             VIEW_SIZE === writtenBytes &&
               (writeToDestination(destination, currentView),
-              (currentView = new Uint8Array(VIEW_SIZE)),
+              (currentView = myNewArray()),
               (writtenBytes = 0))));
+
+      reactTimings.writeViewChunk += performance.now() - start;
     }
 
     function writeChunk(destination, chunk) {
@@ -499,10 +553,9 @@ const require_server_node = __commonJS({
       destinationHasCapacity = true;
     }
 
-    var textEncoder = new TextEncoder();
-
-    function stringToPrecomputedChunk(a) {
-      return textEncoder.encode(a);
+    function stringToPrecomputedChunk(str) {
+      // return textEncoder.encode(str);
+      return myEncode(str);
     }
 
     var hasOwnProperty = Object.prototype.hasOwnProperty;

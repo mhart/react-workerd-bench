@@ -15,6 +15,8 @@ export default {
 
     const start = performance.now();
 
+    globalThis.reactTimings.numRequests++;
+
     const { pipe } = renderToPipeableStream(createRoot(), {
       onShellReady() {
         console.log("onShellReady", round(performance.now() - start));
@@ -36,6 +38,7 @@ export default {
                 },
                 end() {
                   console.log("end", round(performance.now() - start));
+                  console.log(formatTimings());
                   controller.close();
                 },
                 destroy(err) {
@@ -58,4 +61,13 @@ export default {
 
 function round(num) {
   return Math.round(num * 100) / 100;
+}
+
+function formatTimings() {
+  const timings = { ...globalThis.reactTimings };
+  for (const key in timings) {
+    if (key === "numRequests") continue;
+    timings[key] = round(timings[key] / globalThis.reactTimings.numRequests);
+  }
+  return timings;
 }
