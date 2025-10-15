@@ -19,7 +19,7 @@ async function measureResponseTime(url) {
     });
     const body = await response.arrayBuffer();
 
-    const expectedLength = DISCARD_BODY ? 0 : 1985618;
+    const expectedLength = DISCARD_BODY ? 0 : 1985619;
 
     if (body.byteLength !== expectedLength) {
       throw new Error(

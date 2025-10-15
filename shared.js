@@ -3331,7 +3331,7 @@ function ComplexComponent() {
 
 function createRoot() {
   console.log("rendering", Date.now());
-  const currentTime = new Date().toLocaleString();
+  const currentTime = new Date().toISOString();
 
   return React.createElement(
     "main",
