@@ -1,0 +1,18 @@
+{
+  "name": "react-workerd-bench",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "workerd-low": "workerd serve config.lowmem.capnp",
+    "workerd-high": "workerd serve config.highmem.capnp",
+    "node-low": "node --max-old-space-size=128 --max-semi-space-size=8 --single-threaded server.js",
+    "node-high": "node --max-old-space-size=4096 --max-semi-space-size=64 --single-threaded server.js",
+    "workerd-inspect": "npm run workerd-high -- -i localhost:9229",
+    "node-inspect": "node --inspect --max-old-space-size=4096 --max-semi-space-size=64 --single-threaded server.js",
+    "bench": "node runner.js"
+  },
+  "devDependencies": {
+    "workerd": "1.20251011.0"
+  }
+}
