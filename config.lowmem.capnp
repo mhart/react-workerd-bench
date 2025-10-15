@@ -16,4 +16,5 @@ const reactBench :Workerd.Worker = (
     (name = "shared.js", esModule = embed "shared.js")
   ],
   compatibilityDate = "2025-10-11",
+  compatibilityFlags = ["nodejs_compat"],
 );

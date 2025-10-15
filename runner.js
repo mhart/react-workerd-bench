@@ -4,7 +4,7 @@ import path from "node:path";
 const WORKERD_URL = "http://localhost:3000/bench";
 const NODE_URL = "http://localhost:3001/bench";
 
-const ITERATIONS = 20;
+const ITERATIONS = 100;
 const CONCURRENCY = 1;
 const DISCARD_BODY = false;
 
