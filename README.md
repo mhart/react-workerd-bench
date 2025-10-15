@@ -77,10 +77,10 @@ Concurrency: 1
 ```bash
 | Platform | Mean   | Min    | Max    | Variability |
 |----------|--------|--------|--------|-------------|
-| workerd  | 0.071s | 0.067s | 0.094s |      0.027s |
-| node     | 0.028s | 0.025s | 0.050s |      0.025s |
+| workerd  | 0.062s | 0.059s | 0.084s |      0.025s |
+| node     | 0.028s | 0.024s | 0.047s |      0.023s |
 
-**Winner:** node (2.52x faster)
+**Winner:** node (2.22x faster)
 ```
 
 ### Low Memory (`[workerd|node]-low`)
@@ -88,10 +88,10 @@ Concurrency: 1
 ```bash
 | Platform | Mean   | Min    | Max    | Variability |
 |----------|--------|--------|--------|-------------|
-| workerd  | 0.078s | 0.072s | 0.099s |      0.027s |
-| node     | 0.041s | 0.029s | 0.058s |      0.028s |
+| workerd  | 0.070s | 0.064s | 0.097s |      0.033s |
+| node     | 0.039s | 0.030s | 0.049s |      0.019s |
 
-**Winner:** node (1.91x faster)
+**Winner:** node (1.79x faster)
 ```
 
 ### Low Memory w/ `DISCARD_BODY = true`
@@ -99,8 +99,8 @@ Concurrency: 1
 ```bash
 | Platform | Mean   | Min    | Max    | Variability |
 |----------|--------|--------|--------|-------------|
-| workerd  | 0.053s | 0.051s | 0.085s |      0.034s |
-| node     | 0.039s | 0.030s | 0.074s |      0.043s |
+| workerd  | 0.052s | 0.050s | 0.076s |      0.026s |
+| node     | 0.037s | 0.028s | 0.040s |      0.012s |
 
-**Winner:** node (1.38x faster)
+**Winner:** node (1.44x faster)
 ```

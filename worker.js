@@ -21,6 +21,7 @@ export default {
 
         resolveBody(
           new ReadableStream({
+            type: "bytes",
             start(controller) {
               pipe({
                 on(event, callback) {

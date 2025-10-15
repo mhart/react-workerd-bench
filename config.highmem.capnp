@@ -6,7 +6,7 @@ const reactBenchConfig :Workerd.Config = (
 
   sockets = [ ( name = "http", address = "*:3000", http = (), service = "main" ) ],
 
-  # With this, Node.js is 2.5x faster
+  # With this, Node.js is 2.2x faster
   v8Flags = ["--max-old-space-size=4096", "--max-semi-space-size=64", "--single-threaded"]
 );
 
